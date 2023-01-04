@@ -1,15 +1,15 @@
-title:              Clean Blog
-email:              your-email@example.com
-description:        A Blog Theme by Start Bootstrap
-author:             Start Bootstrap
-baseurl:            "/startbootstrap-clean-blog-jekyll"
-url:                "https://startbootstrap.github.io"
+title:              juuc의 개발 일지
+email:              ju.woocheol@gmail.com
+description:        리액트 네이티브를 주로 다룹니다.
+author:             juuc
+baseurl:            ""
+url:                "https://juuc.github.io"
 
 # Social Profiles
-twitter_username:   SBootstrap
-github_username:    StartBootstrap
-facebook_username:  StartBootstrap
-instagram_username:  
+twitter_username:   
+github_username:    juuc
+facebook_username:  
+instagram_username:  ucheolju
 linkedin_username:
 
 # Add your google-analytics ID here to activate google analytics
