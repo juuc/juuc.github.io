@@ -10,6 +10,30 @@ type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage, lang, translation } = Astro.props;
 const htmlLang = lang ?? 'en';
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).toString();
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Article',
+	headline: title,
+	description,
+	datePublished: pubDate.toISOString(),
+	dateModified: (updatedDate ?? pubDate).toISOString(),
+	author: {
+		'@type': 'Person',
+		name: 'Ju Woocheol',
+		url: 'https://juuc.github.io',
+		sameAs: ['https://github.com/juuc', 'https://juuc.github.io/portfolio/'],
+	},
+	publisher: {
+		'@type': 'Person',
+		name: 'Ju Woocheol',
+		url: 'https://juuc.github.io',
+	},
+	inLanguage: htmlLang === 'ko' ? 'ko-KR' : 'en-US',
+	url: canonicalURL,
+	mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL },
+};
 const switcherLabel = htmlLang === 'en' ? '🇰🇷 한국어로 보기' : '🇺🇸 Read in English';
 
 // Build hreflang map from the frontmatter `translation` field.
@@ -30,7 +54,10 @@ const translations = translation
 			description={description}
 			lang={htmlLang}
 			translations={translations}
+			isArticle={true}
+			pubDate={pubDate}
 		/>
+		<Fragment set:html={`<script type="application/ld+json">${JSON.stringify(articleSchema)}</script>`} />
 		<style>
 			main {
 				padding-top: 1.5em;
