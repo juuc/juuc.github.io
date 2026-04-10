@@ -1,7 +1,8 @@
 /*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
+  Based on Bear Blog's default CSS, substantially customized for
+  Ju Woocheol's dev blog — Korean/English bilingual, tamed type scale,
+  unified content widths.
+  https://github.com/HermanMartinus/bearblog/blob/master/templates/styles/blog/default.css
  */
 
 :root {
@@ -15,8 +16,18 @@
 	--box-shadow:
 		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
 		0 16px 32px rgba(var(--gray), 33%);
+
+	/* Single source of truth for content width. Used by main, prose, indexes. */
+	--content-width: 720px;
 }
+
 body {
+	/*
+	  English pages use Atkinson Hyperlegible. Astro's --font-atkinson variable
+	  resolves to a full chain ending in `sans-serif`, so we can't prepend or
+	  append Korean fonts to it — `sans-serif` in the middle cuts off the chain.
+	  Instead, Korean pages override this via the html[lang="ko"] selector below.
+	*/
 	font-family: var(--font-atkinson);
 	margin: 0;
 	padding: 0;
@@ -26,15 +37,36 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
+	font-size: 18px;
+	line-height: 1.65;
 }
+
+/*
+  Korean-language pages use Pretendard (via CDN in BaseHead), which ships with
+  both Hangul and harmonized Latin glyphs so English terms in Korean posts look
+  consistent with the Korean prose. OS fallbacks handle older browsers.
+*/
+html[lang='ko'],
+html[lang='ko'] body,
+[lang='ko'] {
+	font-family:
+		'Pretendard Variable',
+		Pretendard,
+		-apple-system,
+		BlinkMacSystemFont,
+		'Apple SD Gothic Neo',
+		'Noto Sans KR',
+		'Malgun Gothic',
+		sans-serif;
+}
+
 main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
+	width: 100%;
+	max-width: var(--content-width);
+	margin: 0 auto;
 	padding: 3em 1em;
 }
+
 h1,
 h2,
 h3,
@@ -43,22 +75,24 @@ h5,
 h6 {
 	margin: 0 0 0.5rem 0;
 	color: rgb(var(--black));
-	line-height: 1.2;
+	line-height: 1.25;
+	font-weight: 700;
 }
+/* Tamed type scale — inside a 720px column these numbers actually work. */
 h1 {
-	font-size: 3.052em;
+	font-size: 2em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: 1.6em;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: 1.25em;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: 1.1em;
 }
 h5 {
-	font-size: 1.25em;
+	font-size: 1em;
 }
 strong,
 b {
@@ -68,14 +102,42 @@ a {
 	color: var(--accent);
 }
 a:hover {
-	color: var(--accent);
+	color: var(--accent-dark);
 }
 p {
 	margin-bottom: 1em;
 }
-.prose p {
-	margin-bottom: 2em;
+
+/* Prose-specific rules — applied inside BlogPost layout .prose wrapper */
+.prose {
+	/*
+	  word-break: keep-all is essential for Korean text. Without it, Hangul
+	  syllables break mid-word in narrow containers. It doesn't affect Latin
+	  text because English words have no "mid-character break" behavior.
+	*/
+	word-break: keep-all;
+	overflow-wrap: break-word;
 }
+.prose p {
+	margin-bottom: 1.25em;
+}
+.prose h2 {
+	margin-top: 2em;
+	margin-bottom: 0.5em;
+}
+.prose h3 {
+	margin-top: 1.5em;
+	margin-bottom: 0.4em;
+}
+.prose ul,
+.prose ol {
+	margin-bottom: 1.25em;
+	padding-left: 1.5em;
+}
+.prose li {
+	margin-bottom: 0.35em;
+}
+
 textarea {
 	width: 100%;
 	font-size: 16px;
@@ -85,6 +147,20 @@ input {
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+	margin: 1.5em 0;
+	font-size: 0.95em;
+}
+th,
+td {
+	border: 1px solid rgb(var(--gray-light));
+	padding: 0.5em 0.75em;
+	text-align: left;
+	vertical-align: top;
+}
+th {
+	background: rgb(var(--gray-light));
+	font-weight: 700;
 }
 img {
 	max-width: 100%;
@@ -94,31 +170,46 @@ img {
 code {
 	padding: 2px 5px;
 	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
+	border-radius: 3px;
+	font-size: 0.9em;
+	font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 pre {
-	padding: 1.5em;
+	padding: 1.25em;
 	border-radius: 8px;
+	overflow-x: auto;
+	font-size: 0.9em;
+	line-height: 1.55;
 }
 pre > code {
 	all: unset;
+	font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 blockquote {
 	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
+	padding: 0.5em 0 0.5em 1em;
+	margin: 1.5em 0;
+	color: rgb(var(--gray-dark));
+	font-style: italic;
 }
 hr {
 	border: none;
 	border-top: 1px solid rgb(var(--gray-light));
+	margin: 1.5em 0;
 }
+
 @media (max-width: 720px) {
 	body {
-		font-size: 18px;
+		font-size: 17px;
 	}
 	main {
-		padding: 1em;
+		padding: 1.5em 1em;
+	}
+	h1 {
+		font-size: 1.75em;
+	}
+	h2 {
+		font-size: 1.4em;
 	}
 }
 
@@ -130,12 +221,8 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
 	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }

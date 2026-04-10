@@ -11,11 +11,27 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
+	/**
+	 * Language of the current page. Used to render hreflang alternates.
+	 * Omit on pages that are not part of the bilingual system (home, about).
+	 */
+	lang?: 'en' | 'ko';
+	/**
+	 * Absolute paths for the same page in each language.
+	 * Example on an English post with a Korean translation:
+	 *   { en: '/blog/my-post/', ko: '/blog/ko/my-post/' }
+	 * When provided, hreflang alternates are emitted. x-default points to English.
+	 */
+	translations?: { en?: string; ko?: string };
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+const { title, description, image = FallbackImage, lang, translations } = Astro.props;
+
+function absoluteUrl(path: string) {
+	return new URL(path, Astro.site).toString();
+}
 ---
 
 <!-- Global Metadata -->
@@ -32,15 +48,40 @@ const { title, description, image = FallbackImage } = Astro.props;
 />
 <meta name="generator" content={Astro.generator} />
 
+{/* Korean font (Pretendard) — served from a CDN so global.css fallback works even for first paint */}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link
+	rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+/>
+
 <Font cssVariable="--font-atkinson" preload />
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
+{/* hreflang alternates for bilingual pages */}
+{
+	translations && translations.en && (
+		<link rel="alternate" hreflang="en" href={absoluteUrl(translations.en)} />
+	)
+}
+{
+	translations && translations.ko && (
+		<link rel="alternate" hreflang="ko" href={absoluteUrl(translations.ko)} />
+	)
+}
+{
+	translations && translations.en && (
+		<link rel="alternate" hreflang="x-default" href={absoluteUrl(translations.en)} />
+	)
+}
+
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+{lang && <meta http-equiv="content-language" content={lang} />}
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content="website" />
@@ -48,6 +89,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={new URL(image.src, Astro.url)} />
+{lang && <meta property="og:locale" content={lang === 'ko' ? 'ko_KR' : 'en_US'} />}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />

@@ -1,22 +1,23 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import BaseHead from '../../../components/BaseHead.astro';
+import Footer from '../../../components/Footer.astro';
+import FormattedDate from '../../../components/FormattedDate.astro';
+import Header from '../../../components/Header.astro';
+import { SITE_TITLE } from '../../../consts';
 
-const posts = (await getCollection('blog', ({ data }) => data.lang === 'en')).sort(
+const KO_SITE_TITLE = `블로그 · ${SITE_TITLE}`;
+const KO_SITE_DESCRIPTION = '주우철의 React Native 및 React 프론트엔드 개발 블로그.';
+
+const posts = (await getCollection('blog', ({ data }) => data.lang === 'ko')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const hasKorean =
-	(await getCollection('blog', ({ data }) => data.lang === 'ko')).length > 0;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 	<head>
-		<BaseHead title={`Blog · ${SITE_TITLE}`} description={SITE_DESCRIPTION} lang="en" />
+		<BaseHead title={KO_SITE_TITLE} description={KO_SITE_DESCRIPTION} lang="ko" />
 		<style>
 			.page-header {
 				margin-bottom: 2em;
@@ -75,30 +76,39 @@ const hasKorean =
 				font-size: 0.85em;
 				color: rgb(var(--gray));
 			}
+			.empty {
+				color: rgb(var(--gray));
+				text-align: center;
+				padding: 3em 0;
+			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
 			<div class="page-header">
-				<h1>Blog</h1>
-				{hasKorean && <a class="lang-link" lang="ko" href="/blog/ko/">🇰🇷 한국어 →</a>}
+				<h1>블로그</h1>
+				<a class="lang-link" href="/blog/">🇺🇸 English →</a>
 			</div>
-			<ul class="post-list">
-				{
-					posts.map((post) => (
-						<li>
-							<a href={`/blog/${post.id}/`}>
-								<h2>{post.data.title}</h2>
-								<p class="description">{post.data.description}</p>
-								<p class="meta">
-									<FormattedDate date={post.data.pubDate} />
-								</p>
-							</a>
-						</li>
-					))
-				}
-			</ul>
+			{
+				posts.length === 0 ? (
+					<p class="empty">아직 한국어 글이 없어요.</p>
+				) : (
+					<ul class="post-list">
+						{posts.map((post) => (
+							<li>
+								<a href={`/blog/${post.id}/`}>
+									<h2>{post.data.title}</h2>
+									<p class="description">{post.data.description}</p>
+									<p class="meta">
+										<FormattedDate date={post.data.pubDate} />
+									</p>
+								</a>
+							</li>
+						))}
+					</ul>
+				)
+			}
 		</main>
 		<Footer />
 	</body>

@@ -1,48 +1,144 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const recentPosts = (await getCollection('blog', ({ data }) => data.lang === 'en'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 5);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} lang="en" />
+		<style>
+			.intro {
+				padding: 2em 0 3em 0;
+				border-bottom: 1px solid rgb(var(--gray-light));
+				margin-bottom: 2.5em;
+			}
+			.intro h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.intro .tagline {
+				color: rgb(var(--gray-dark));
+				font-size: 1.05em;
+				margin: 0 0 1em 0;
+			}
+			.intro .links {
+				margin: 0;
+				font-size: 0.95em;
+			}
+			.intro .links a {
+				color: var(--accent);
+				text-decoration: none;
+			}
+			.intro .links a:hover {
+				text-decoration: underline;
+			}
+			.intro .links span {
+				margin: 0 0.5em;
+				color: rgb(var(--gray));
+			}
+			.recent h2 {
+				margin: 0 0 1em 0;
+			}
+			.post-list {
+				list-style: none;
+				padding: 0;
+				margin: 0 0 1.5em 0;
+			}
+			.post-list li {
+				padding: 1em 0;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+			.post-list li:last-child {
+				border-bottom: none;
+			}
+			.post-list a {
+				display: block;
+				text-decoration: none;
+				color: inherit;
+			}
+			.post-list h3 {
+				font-size: 1.15em;
+				margin: 0 0 0.25em 0;
+				color: rgb(var(--black));
+				transition: color 0.2s ease;
+			}
+			.post-list a:hover h3 {
+				color: var(--accent);
+			}
+			.post-list .description {
+				margin: 0 0 0.35em 0;
+				color: rgb(var(--gray-dark));
+				font-size: 0.9em;
+			}
+			.post-list .meta {
+				margin: 0;
+				font-size: 0.8em;
+				color: rgb(var(--gray));
+			}
+			.see-all {
+				margin: 0;
+			}
+			.see-all a {
+				color: var(--accent);
+				text-decoration: none;
+				font-size: 0.95em;
+			}
+			.see-all a:hover {
+				text-decoration: underline;
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<section class="intro">
+				<h1>Ju Woocheol</h1>
+				<p class="tagline">
+					React Native and React frontend engineer. I write about shipping
+					production frontend code — performance, architecture, migrations,
+					and the tradeoffs nobody else mentions.
+				</p>
+				<p class="links">
+					<a href="/blog/">Blog</a>
+					<span aria-hidden="true">·</span>
+					<a href="/blog/ko/" lang="ko">한국어</a>
+					<span aria-hidden="true">·</span>
+					<a href="https://juuc.github.io/portfolio/" target="_blank" rel="noopener noreferrer"
+						>Portfolio</a>
+					<span aria-hidden="true">·</span>
+					<a href="https://github.com/juuc" target="_blank" rel="noopener noreferrer">GitHub</a>
+				</p>
+			</section>
+
+			<section class="recent">
+				<h2>Recent posts</h2>
+				{
+					recentPosts.length > 0 && (
+						<ul class="post-list">
+							{recentPosts.map((post) => (
+								<li>
+									<a href={`/blog/${post.id}/`}>
+										<h3>{post.data.title}</h3>
+										<p class="description">{post.data.description}</p>
+										<p class="meta">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</a>
+								</li>
+							))}
+						</ul>
+					)
+				}
+				<p class="see-all"><a href="/blog/">See all posts →</a></p>
+			</section>
 		</main>
 		<Footer />
 	</body>

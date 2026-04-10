@@ -14,6 +14,12 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// i18n: language of this post. Defaults to 'en' so existing posts keep working.
+			lang: z.enum(['en', 'ko']).default('en'),
+			// i18n: slug (relative to /blog/) of the same post in the other language.
+			// Example: on an English post, set translation: 'ko/my-post'.
+			// When set, BlogPost layout renders a language switcher link.
+			translation: z.string().optional(),
 		}),
 });
 

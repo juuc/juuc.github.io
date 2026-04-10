@@ -3,7 +3,8 @@ import rss from '@astrojs/rss';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
 export async function GET(context) {
-	const posts = await getCollection('blog');
+	// English feed only. A Korean feed can live at /ko/rss.xml later if needed.
+	const posts = await getCollection('blog', ({ data }) => data.lang === 'en');
 	return rss({
 		title: SITE_TITLE,
 		description: SITE_DESCRIPTION,
